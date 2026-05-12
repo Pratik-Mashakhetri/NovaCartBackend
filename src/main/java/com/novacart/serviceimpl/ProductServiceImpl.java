@@ -17,33 +17,55 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
-    private final ProductRepository productRepository;
+	private final ProductRepository productRepository;
 
-    @Override
-    public Product addProduct(ProductRequest request) {
+	@Override
+	public Product addProduct(ProductRequest request) {
 
-        Product product = Product.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .price(request.getPrice())
-                .stockQuantity(request.getStockQuantity())
-                .imageUrl(request.getImageUrl())
-                .category(request.getCategory())
-                .createdAt(LocalDateTime.now())
-                .build();
+		Product product = Product.builder()
+				.name(request.getName())
+				.description(request.getDescription())
+				.price(request.getPrice())
+				.stockQuantity(request.getStockQuantity())
+				.imageUrl(request.getImageUrl())
+				.category(request.getCategory())
+				.createdAt(LocalDateTime.now())
+				.build();
 
-        return productRepository.save(product);
-    }
+		return productRepository.save(product);
+	}
 
-    @Override
-    public List<Product> getAllProducts() {
+	@Override
+	public List<Product> getAllProducts() {
 
-        return productRepository.findAll();
-    }
-    
-    @Override
-    public Product getProductById(Long id) {
+		return productRepository.findAll();
+	}
 
-        return productRepository.findById(id)
-        		.orElseThrow(() -> new ResourceNotFoundException("Product Not Found"));    }
+	@Override
+	public Product getProductById(Long id) {
+
+		return productRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Product Not Found"));    
+	}
+
+
+	@Override
+	public Product updateProduct(Long id, ProductRequest request) {
+
+		Product product = productRepository.findById(id)
+				.orElseThrow(() ->
+				new ResourceNotFoundException("Product Not Found"));
+
+		product.setName(request.getName());
+		product.setDescription(request.getDescription());
+		product.setPrice(request.getPrice());
+		product.setStockQuantity(request.getStockQuantity());
+		product.setImageUrl(request.getImageUrl());
+		product.setCategory(request.getCategory());
+
+		return productRepository.save(product);
+	}
+
+
+
 }

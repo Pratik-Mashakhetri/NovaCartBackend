@@ -44,13 +44,19 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers("/api/auth/**").permitAll()
+                	    .requestMatchers("/api/auth/**").permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/api/products")
-                        .hasRole("ADMIN")
+                	    .requestMatchers(HttpMethod.GET, "/api/products/**")
+                	    .permitAll()
 
-                        .anyRequest().authenticated()
-                )
+                	    .requestMatchers(HttpMethod.POST, "/api/products")
+                	    .hasRole("ADMIN")
+
+                	    .requestMatchers(HttpMethod.PUT, "/api/products/**")
+                	    .hasRole("ADMIN")
+
+                	    .anyRequest().authenticated()
+                	)
 
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
