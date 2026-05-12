@@ -3,6 +3,8 @@ package com.novacart.serviceimpl;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.novacart.dto.ProductRequest;
@@ -75,6 +77,18 @@ public class ProductServiceImpl implements ProductService {
 	                    new ResourceNotFoundException("Product Not Found"));
 
 	    productRepository.delete(product);
+	}
+	
+	@Override
+	public List<Product> searchProducts(String keyword) {
+
+	    return productRepository.findByNameContainingIgnoreCase(keyword);
+	}
+	
+	@Override
+	public Page<Product> getProductsWithPagination(int page, int size) {
+
+	    return productRepository.findAll(PageRequest.of(page, size));
 	}
 	
 
