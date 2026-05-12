@@ -1,0 +1,55 @@
+package com.novacart.controller;
+
+import java.util.List;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.novacart.entity.Order;
+import com.novacart.service.OrderService;
+
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/api/orders")
+@RequiredArgsConstructor
+public class OrderController {
+
+    private final OrderService orderService;
+
+    @PostMapping("/place")
+    public Order placeOrder(
+            Authentication authentication
+    ) {
+
+        String email = authentication.getName();
+
+        return orderService.placeOrder(email);
+    }
+    
+    
+    @GetMapping("/my-orders")
+    public List<Order> getUserOrders(
+            Authentication authentication
+    ) {
+
+        String email = authentication.getName();
+
+        return orderService.getUserOrders(email);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+}
