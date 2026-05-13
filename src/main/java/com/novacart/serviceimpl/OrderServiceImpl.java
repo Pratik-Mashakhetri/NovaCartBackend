@@ -1,18 +1,25 @@
 package com.novacart.serviceimpl;
 
-import com.novacart.entity.*;
-import com.novacart.exception.ResourceNotFoundException;
-import com.novacart.repository.*;
-
-import com.novacart.service.OrderService;
-
-import lombok.RequiredArgsConstructor;
-
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.novacart.entity.Address;
+import com.novacart.entity.CartItem;
+import com.novacart.entity.Order;
+import com.novacart.entity.OrderItem;
+import com.novacart.entity.OrderStatus;
+import com.novacart.entity.User;
+import com.novacart.exception.ResourceNotFoundException;
+import com.novacart.repository.AddressRepository;
+import com.novacart.repository.CartItemRepository;
+import com.novacart.repository.OrderRepository;
+import com.novacart.repository.UserRepository;
+import com.novacart.service.OrderService;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -21,13 +28,26 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final CartItemRepository cartItemRepository;
     private final OrderRepository orderRepository;
+    private final AddressRepository addressRepository;
 
     @Override
-    public Order placeOrder(String email) {
+    public Order placeOrder(
+            String email,
+            Long addressId
+    ) {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User Not Found"));
+
+        Address address = addressRepository.findById(addressId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Address Not Found"));
+
+        if (!address.getUser().getId().equals(user.getId())) {
+
+            throw new RuntimeException("Unauthorized Address Access");
+        }
 
         List<CartItem> cartItems =
                 cartItemRepository.findByUser(user);
@@ -64,14 +84,22 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatus.PENDING);
         order.setOrderDate(LocalDateTime.now());
 
+        // Shipping Address Snapshot
+        order.setFullName(address.getFullName());
+        order.setMobileNumber(address.getMobileNumber());
+        order.setAddressLine(address.getAddressLine());
+        order.setCity(address.getCity());
+        order.setState(address.getState());
+        order.setPincode(address.getPincode());
+        order.setCountry(address.getCountry());
+
         Order savedOrder = orderRepository.save(order);
 
         cartItemRepository.deleteAll(cartItems);
 
         return savedOrder;
     }
-    
-    
+
     @Override
     public List<Order> getUserOrders(String email) {
 
@@ -81,13 +109,13 @@ public class OrderServiceImpl implements OrderService {
 
         return orderRepository.findByUser(user);
     }
-    
+
     @Override
     public List<Order> getAllOrders() {
 
         return orderRepository.findAll();
     }
-    
+
     @Override
     public Order updateOrderStatus(
             Long orderId,
@@ -102,13 +130,4 @@ public class OrderServiceImpl implements OrderService {
 
         return orderRepository.save(order);
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
 }

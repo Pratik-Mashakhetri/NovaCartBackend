@@ -7,7 +7,10 @@ import com.novacart.entity.OrderStatus;
 
 public interface OrderService {
 
-    Order placeOrder(String email);
+	Order placeOrder(
+	        String email,
+	        Long addressId
+	);
     
     List<Order> getUserOrders(String email);
     

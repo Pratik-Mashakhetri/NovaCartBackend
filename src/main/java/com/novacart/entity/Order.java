@@ -34,7 +34,7 @@ public class Order {
 
     @ManyToOne
     private User user;
-
+    
     @OneToMany(mappedBy = "order",
             cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
@@ -45,4 +45,24 @@ public class Order {
     private OrderStatus status;
 
     private LocalDateTime orderDate;
+    
+    private String fullName;
+
+    private String mobileNumber;
+
+    private String addressLine;
+
+    private String city;
+
+    private String state;
+
+    private String pincode;
+
+    private String country;
+    
+    
+    
+    
+    
+    
 }

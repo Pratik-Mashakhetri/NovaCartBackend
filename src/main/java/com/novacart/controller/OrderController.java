@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.novacart.entity.Order;
@@ -22,12 +23,16 @@ public class OrderController {
 
     @PostMapping("/place")
     public Order placeOrder(
+            @RequestParam Long addressId,
             Authentication authentication
     ) {
 
         String email = authentication.getName();
 
-        return orderService.placeOrder(email);
+        return orderService.placeOrder(
+                email,
+                addressId
+        );
     }
     
     
