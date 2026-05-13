@@ -16,6 +16,7 @@ import com.novacart.exception.ResourceNotFoundException;
 import com.novacart.repository.AddressRepository;
 import com.novacart.repository.CartItemRepository;
 import com.novacart.repository.OrderRepository;
+import com.novacart.repository.ProductRepository;
 import com.novacart.repository.UserRepository;
 import com.novacart.service.OrderService;
 
@@ -29,6 +30,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartItemRepository cartItemRepository;
     private final OrderRepository orderRepository;
     private final AddressRepository addressRepository;
+    private final ProductRepository productRepository;
 
     @Override
     public Order placeOrder(
@@ -127,6 +129,43 @@ public class OrderServiceImpl implements OrderService {
                         new ResourceNotFoundException("Order Not Found"));
 
         order.setStatus(status);
+
+        return orderRepository.save(order);
+    }
+    
+    @Override
+    public Order cancelOrder(Long orderId, String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User Not Found"));
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Order Not Found"));
+
+        // security check
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        // prevent multiple cancel
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new RuntimeException("Order Already Cancelled");
+        }
+
+        // restore stock
+        order.getOrderItems().forEach(item -> {
+
+            item.getProduct().setStockQuantity(
+                    item.getProduct().getStockQuantity()
+                            + item.getQuantity()
+            );
+
+            productRepository.save(item.getProduct());
+        });
+
+        order.setStatus(OrderStatus.CANCELLED);
 
         return orderRepository.save(order);
     }

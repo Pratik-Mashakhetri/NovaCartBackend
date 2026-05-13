@@ -21,6 +21,8 @@ public interface OrderService {
             OrderStatus status
     );
     
+    Order cancelOrder(Long orderId, String email);
+    
     
     
 }
