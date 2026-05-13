@@ -40,6 +40,8 @@ public class PaymentServiceImpl implements PaymentService {
 
         order.setStatus(OrderStatus.PAID);
         
+        
+        //Reduce Stock 
         order.getOrderItems().forEach(item -> {
 
             item.getProduct().setStockQuantity(

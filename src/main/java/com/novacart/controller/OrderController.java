@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.novacart.entity.Order;
+import com.novacart.entity.OrderStatus;
+import com.novacart.entity.OrderStatus;
 import com.novacart.service.OrderService;
 
 import lombok.RequiredArgsConstructor;
@@ -60,6 +62,17 @@ public class OrderController {
         return orderService.cancelOrder(orderId, email);
     }
     
+    @PutMapping("/admin/status/{orderId}")
+    public Order updateOrderStatus(
+            @PathVariable Long orderId,
+            @RequestParam OrderStatus status
+    ) {
+
+        return orderService.updateOrderStatus(
+                orderId,
+                status
+        );
+    }
     
     
     
